@@ -15,20 +15,37 @@ var MaterialEditor = function (editor) {
       if (confirm("确认新建？")) { location.reload(); }
     },
 
+    open_export_dialog: function () {
+
+      if (currentObject === undefined) { alert("未找到可导出对象。"); return; }
+
+      document.getElementById("editor_pop").style.display = "inline-block";
+      document.getElementById("export_dialog").style.display = "inline-block";
+
+    },
+
     save: function () {
-      if (currentObject === undefined) { alert("未找到可导出对象。"); return; }
-      saveString(JSON.stringify(currentObject.toJSON()), "model.json");
+
+      var select = document.getElementById("export_select");
+      var value = select.options[select.selectedIndex].value;
+
+      switch (value) {
+        case "json":
+          saveString(JSON.stringify(currentObject.toJSON()), "model.json"); break;
+        case "drcobj":
+          saveArrayBuffer((new THREE.DrcobjExporter()).parse(currentObject.toJSON(), { quantization: [16, 16, 16, 16, 16] }), "model.drcobj"); break;
+        case "gltf":
+          (new THREE.GLTFExporter()).parse(currentObject, function (gltf) { saveArrayBuffer(gltf, "model.glb"); }, { binary: true }); break;
+        default: break;
+      }
+
+      self.functionOptions.close_export_dialog();
     },
 
-    save_gltf: function () {
-      if (currentObject === undefined) { alert("未找到可导出对象。"); return; }
-      (new THREE.GLTFExporter()).parse(currentObject, function (gltf) { saveArrayBuffer(gltf, "model.glb"); }, { binary: true });
-    },
-
-    save_drcobj: function () {
-      if (currentObject === undefined) { alert("未找到可导出对象。"); return; }
-      saveArrayBuffer((new THREE.DrcobjExporter()).parse(currentObject.toJSON(), { quantization: [16, 16, 16, 16, 16] }), "model.drcobj");
-    },
+    close_export_dialog: function () {
+      document.getElementById("editor_pop").style.display = "none";
+      document.getElementById("export_dialog").style.display = "none";
+    }
 
   };
 
