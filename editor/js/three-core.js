@@ -52,7 +52,7 @@ var ThreeCore = function () {
     cameraController.update(); // 首次更正相机控制器
 
     // 网格辅助线
-    var gridHelper = new THREE.GridHelper(20, 20, new THREE.Color(0x222222), new THREE.Color(0xEEEEEE));
+    var gridHelper = new THREE.GridHelper(28, 28, new THREE.Color(0x222222), new THREE.Color(0xEEEEEE));
     scene.add(gridHelper);
 
     renderer.render(scene, camera); // 首次画面渲染
