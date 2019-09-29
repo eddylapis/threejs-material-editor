@@ -24,22 +24,48 @@ var MaterialEditor = function (editor) {
 
     },
 
-    save: function () {
+    save: function (options) {
 
       var select = document.getElementById("export_select");
       var value = select.options[select.selectedIndex].value;
 
-      switch (value) {
-        case "json":
-          saveString(JSON.stringify(currentObject.toJSON()), "model.json"); break;
-        case "drcobj":
-          saveArrayBuffer((new THREE.DrcobjExporter()).parse(currentObject.toJSON(), { quantization: [16, 16, 16, 16, 16] }), "model.drcobj"); break;
-        case "gltf":
-          (new THREE.GLTFExporter()).parse(currentObject, function (gltf) { saveArrayBuffer(gltf, "model.glb"); }, { binary: true }); break;
-        default: break;
+      if (value === "json" || value === "drcobj") {
+
+        var currentObjectJSONData = currentObject.toJSON();
+
+        if (options === undefined) { options = {}; }
+        if (options.includeImg === undefined) { options.includeImg = true; }
+
+        if (options.includeImg === false) { externalImgHandler(currentObjectJSONData); }
+
+        if (value === "json") { save_json(currentObjectJSONData); }
+        else if (value === "drcobj") { save_drcobj(currentObjectJSONData); }
+
+      } else if (value === "gltf") { save_gltf(); }
+
+      function save_json(jsonData) {
+        saveString(JSON.stringify(jsonData), "model.json");
+      }
+
+      function save_drcobj(jsonData) {
+        var save_buffer = (new THREE.DrcobjExporter()).parse(jsonData, { quantization: [16, 16, 16, 16, 16] });
+        saveArrayBuffer(save_buffer, "model.drcobj");
+      }
+
+      function save_gltf() {
+        (new THREE.GLTFExporter()).parse(currentObject, function (gltf) {
+          saveArrayBuffer(gltf, "model.glb");
+        }, { binary: true });
+      }
+
+      function externalImgHandler(jsonData) {
+        for (let index = 0; index < jsonData.textures.length; index++) {
+          jsonData.images[index].url = "./textures/" + jsonData.textures[index].name;
+        }
       }
 
       self.functionOptions.close_export_dialog();
+
     },
 
     close_export_dialog: function () {
