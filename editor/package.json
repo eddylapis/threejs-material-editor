@@ -9,9 +9,7 @@
   },
   "author": "Blinking",
   "license": "MIT",
-  "dependencies": {
-    "signals": "^1.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "electron": "^6.0.10",
     "electron-packager": "^14.0.6"
